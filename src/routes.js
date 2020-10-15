@@ -3,9 +3,23 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import Auth from "./Components/Auth";
+import { firebaseAuth } from "./firebase";
 
 const Routes = () => {
-  return (
+  const [firebaseUser, setFirebaseUser] = React.useState(false);
+
+  React.useEffect(() => {
+    firebaseAuth.onAuthStateChanged((user) => {
+      //console.log(user);
+      if (user) {
+        setFirebaseUser(user);
+      } else {
+        setFirebaseUser(null);
+      }
+    });
+  }, []);
+
+  return firebaseUser !== false ? (
     <BrowserRouter>
       <Switch>
         <Route exact path="/">
@@ -21,6 +35,8 @@ const Routes = () => {
         <Route exact path="*" render={() => "404 Not found!"} />
       </Switch>
     </BrowserRouter>
+  ) : (
+    <div>Cargando...</div>
   );
 };
 

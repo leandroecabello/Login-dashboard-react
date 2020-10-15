@@ -4,13 +4,12 @@ import {
     Box, 
     Avatar, 
     makeStyles, 
-    Typography,
-    TextField,
-    Button
+    Typography
 } from '@material-ui/core'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { firebaseAuth, firestore } from '../firebase'
 import TestUser from '../Components/TestUser'
+import LoginForm from '../Components/LoginForm'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -22,18 +21,11 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
       margin: theme.spacing(1),
       backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-      width: '100%',
-      marginTop: theme.spacing(1),
-      textAlign: 'center'
-    },
-    submit: {
-      margin: theme.spacing(3, 0, 2),
     }
   }));
 
 function Login() {
+
     const classes = useStyles()
     const [data, setData] = useState({
         email: '',
@@ -47,7 +39,7 @@ function Login() {
         })
     }
 
-    const submit = e => {
+    const submit = async (e) => {
         e.preventDefault()
         console.log(data.email + ' ' + data.password)
         firestore    
@@ -71,7 +63,7 @@ function Login() {
                     console.log('invalid email or password')
                 }
             })
-    }
+    };
 
     return (
         <Container maxWidth="sm">
@@ -86,42 +78,10 @@ function Login() {
                 <Typography variant="h5">
                     Login
                 </Typography>
-                <form className={classes.form} noValidate onSubmit={submit}>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        onChange={handleInputChange} 
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        onChange={handleInputChange}
-                    />
-                    <Button
-                        type="submit"
-                        disableElevation
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                    >
-                        Login
-                    </Button>
-                </form>
+                <LoginForm 
+                    submit={submit} 
+                    handleInputChange={handleInputChange}
+                />
             </Box>
             <TestUser/>            
         </Container>
