@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import clsx from 'clsx';
 import { 
   makeStyles, 
-  useTheme,
   Drawer,
   CssBaseline,
   Divider,
@@ -10,6 +9,7 @@ import {
 import Navbar from '../Components/Navbar'
 import Main from '../Components/Main';
 import DrawerItems from '../Components/DrawerItems'
+import { firestore } from '../firebase';
 
 const drawerWidth = 240;
 
@@ -51,37 +51,37 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Dashboard = () => {
-    const classes = useStyles();
-    const [open, setOpen] = useState(false);
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
 
-    const handleDrawerOpen = () => {
-        setOpen(!open);
-    };
-        
-    return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <Navbar handleDrawerOpen={handleDrawerOpen} open={true}/>
-        <Drawer
-            variant="permanent"
-            className={clsx(classes.drawer, {
-                [classes.drawerOpen]: !open,
-                [classes.drawerClose]: open,
-            })}
-            classes={{
-                paper: clsx({
-                    [classes.drawerOpen]: !open,
-                    [classes.drawerClose]: open,
-                }),
-            }}
-        >
-          <Divider className={classes.toolbar}/>
-            <DrawerItems/>
-          <Divider/> 
-        </Drawer> 
-        <Main/>
-      </div>
-    )
+  const handleDrawerOpen = () => {
+      setOpen(!open);
+  };
+      
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <Navbar handleDrawerOpen={handleDrawerOpen} open={true}/>
+      <Drawer
+          variant="permanent"
+          className={clsx(classes.drawer, {
+              [classes.drawerOpen]: !open,
+              [classes.drawerClose]: open,
+          })}
+          classes={{
+              paper: clsx({
+                  [classes.drawerOpen]: !open,
+                  [classes.drawerClose]: open,
+              }),
+          }}
+      >
+        <Divider className={classes.toolbar}/>
+          <DrawerItems/>
+        <Divider/> 
+      </Drawer> 
+      <Main/>
+    </div>
+  )
 }
 
 export default Dashboard

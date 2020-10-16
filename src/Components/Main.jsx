@@ -1,49 +1,190 @@
 import React from 'react'
-import { Typography, makeStyles } from '@material-ui/core'
+import { makeStyles, Button, TextField, Grid, Paper, IconButton, List, ListItem, ListItemText, ListItemIcon, TextareaAutosize } from '@material-ui/core'
+import { firestore } from '../firebase'
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles((theme) => ({
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3),
+    root: {
+        flexGrow: 1
     },
-    toolbar: {
+    content: {
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
+        padding: theme.spacing(3)
+    },
+    form: {
+        width: '100%',
+        marginTop: '80px',
+        textAlign: 'center'
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+    paper: {
+        width:'100%',
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      },
+    lista: {
+        width:'100%',
+        padding: '20px'
+    },
+    textList: {
+        paddingRight: '20px'
+    },
+    btnDelete: {
+        color: 'red'
     }
+
 }))
 
 const Main = () => {
     const classes = useStyles()
+    const [tasks, setTasks] = React.useState([])
+    const [task, setTask] = React.useState('')
+    const [edit, setEdit] = React.useState(false)
+    const [id, setId] = React.useState('')
+
+    React.useEffect(() => {
+        const getData = async () => {
+            try{
+                const db = firestore
+                const data = await db.collection('tasks').get()
+                console.log(data.docs)
+                const arrayData = data.docs.map( doc => ({id: doc.id,  ...doc.data()}))
+                console.log(arrayData)
+                setTasks(arrayData)
+            }catch(err){
+                console.log(err)
+            }
+        }
+        getData()
+    }, [])
+
+    const addTask = async (e) => {
+        e.preventDefault()
+        console.log(task)
+
+        try {
+            const db = firestore
+            const newTask = {
+                title: task
+            }
+            const data = await db.collection('tasks').add(newTask)
+            setTasks([
+                ...tasks,
+                {...newTask, id: data.id}
+            ])
+            setTask('')
+        } catch (err) {
+            console.log(err)
+        }
+
+        console.log(task)
+    }
+    
+    const deleteTask = async (id) => {
+        
+        try {
+            const db = firestore
+            await db.collection('tasks').doc(id).delete()  
+            const arrayFilter = tasks.filter(item => item.id !== id)
+            setTasks(arrayFilter)  
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const active = (item) => {
+        setEdit(true)
+        setTask(item.name)
+        setId(item.id)
+    }
+
+    const editTask = async (e) => {
+        e.preventDefault()
+        
+        try{
+            const db = firestore
+            await db.collection('tasks').doc(id).update({
+                title: task
+            })
+
+            const arrayEdited = tasks.map( item => (
+                item.id === id ? {id: item.id, title: task} : item
+            ))
+            
+            setTasks(arrayEdited)
+            setEdit(false)
+            setTask('')
+            setId('')
+
+        }catch(err) {
+            console.log(err)
+        }
+    }
+
     return (
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          <Typography paragraph>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-          facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-          gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-          donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-          Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-          imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-          arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-          donec massa sapien faucibus et molestie ac. 
-          </Typography>
-          <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-          facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-          tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-          consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-          vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-          hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-          tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-          nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-          accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-          </Typography>
+        <main className={classes.root}>
+            <Grid container spacing={2}
+             className={classes.content}
+             >
+                <Grid item xs>                
+                    <form className={classes.form} noValidate onSubmit={ edit ? editTask : addTask}>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            label="task"
+                            autoFocus
+                            onChange={e => setTask(e.target.value)}
+                            
+                        />
+                        <Button
+                            type="submit"
+                            disableElevation
+                            fullWidth
+                            variant="contained"
+                            color={edit ? 'default' : 'primary'}
+                            className={classes.submit}
+                        >
+                            {
+                               edit ? 'Edit' : 'Save'         
+                            }
+                        </Button>
+                    </form>
+                </Grid>
+                <Grid>     
+                    <Paper className={classes.paper} 
+                            p={2}
+                            m={4}>
+                        <List  className={classes.lista}
+                                   
+                        >
+                            {
+                                tasks.map( item => (
+                                    <ListItem key={item.id}>
+                                        <ListItemText className={classes.textList}>
+                                        {item.title}
+                                        </ListItemText>
+                                        <ListItemIcon onClick={() => deleteTask(item.id)}>
+                                            <DeleteIcon color='secondary'/>
+                                        </ListItemIcon>    
+                                        <ListItemIcon onClick={() => active(item)}>
+                                            <EditIcon color='primary'/>
+                                        </ListItemIcon>
+                                    </ListItem>
+                                ))    
+                            }
+                        </List>
+                    </Paper>    
+                </Grid>    
+            </Grid>    
       </main>
     )
 }

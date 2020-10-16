@@ -90,7 +90,7 @@ const Navbar = (props) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap className={classes.title}>
-            Dashboard
+            LOGO
           </Typography>
           <Typography variant="subtitle2" noWrap className={classes.textName}>
             {

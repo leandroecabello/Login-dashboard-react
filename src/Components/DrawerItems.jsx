@@ -1,22 +1,38 @@
 import React from 'react'
 import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import Dashboard from '@material-ui/icons/Dashboard';
+import Edit from '@material-ui/icons/Edit';
 
 const DrawerItems = () => {
     return (
         <List>
-            {['Inbox', 'Starred'].map((text, index) => (
+            <ListItem>
+                <ListItemIcon>
+                    <Dashboard /> 
+                </ListItemIcon>
+                <ListItemText>
+                    Dashboard
+                </ListItemText>
+            </ListItem>
+            <ListItem>
+                <ListItemIcon>
+                    <Edit /> 
+                </ListItemIcon>
+                <ListItemText>
+                    Edit
+                </ListItemText>
+            </ListItem>
+            {/* {['Dashboard', 'Edit'].map((text, index) => (
                 <ListItem button key={text}>
                     <ListItemIcon>{
                         index % 2 === 0 
-                        ? <InboxIcon /> 
-                        : <MailIcon />
+                        ? <Dashboard /> 
+                        : <Edit />
                     }
                     </ListItemIcon>
                     <ListItemText primary={text} />
                 </ListItem>
-            ))}
+            ))} */}
         </List>
     )
 }
